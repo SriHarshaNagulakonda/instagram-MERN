@@ -49,6 +49,8 @@ function App() {
   const [open, setOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
 
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
@@ -75,10 +77,13 @@ function App() {
 
   const { promiseInProgress } = usePromiseTracker();
 
-  const fetchPosts = async() =>
-  await axios.get('/api/sync').then(response => {
-    setPosts(response.data);
-  });
+  const fetchPosts = async() => {
+    await sleep(2000);
+    await axios.get('/api/sync').then(response => {
+      setPosts(response.data);
+    });
+  }
+  
 
   useEffect(() => {
     var pusher = new Pusher('cccdc78c6de2ce551133', {
@@ -251,9 +256,6 @@ function App() {
               />
             ))}
           </FlipMove>
-          <br></br>
-          <br></br>
-          <br></br>
           {promiseInProgress ? 
             <>
               <CircularProgress />

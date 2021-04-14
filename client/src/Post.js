@@ -9,6 +9,8 @@ const Post = forwardRef(
   ({ user, username, postId, imageUrl, caption }, ref) => {
     const [comments, setComments] = useState([]);
     const [comment, setComment] = useState("");
+    const [likes, setlikes] = useState([]);
+    const [liked,setLiked] = useState("false");
 
     const postComment = (e) => {
       e.preventDefault();
@@ -21,13 +23,30 @@ const Post = forwardRef(
       setComment("");
     };
 
+    const updateLike = (e) => {
+      e.preventDefault();
+      
+      if(user&&likes.map((like) => like.user).indexOf(user.displayName)==-1){
+        axios.post("/api/like",{
+          user: user.displayName,
+          post_id: postId
+        });
+      }
+    };
+
     const data={post_id:postId};
     const fetchComments = async() =>
     await axios.get('/api/syncComment',{"params":data}).then(response => {
-      console.log("Comments are >>>>>",response);
       setComments(response.data);
     });
   
+
+    const fetchLikes = async() =>
+    await axios.get('/api/syncLikes',{"params":data}).then(response => {
+      setlikes(response.data);
+      // console.log("Likes are >>>>>",response);
+    });
+
     useEffect(() => {
       var pusher = new Pusher('cccdc78c6de2ce551133', {
         cluster: 'ap2'
@@ -36,6 +55,7 @@ const Post = forwardRef(
       var channel = pusher.subscribe('posts');
       channel.bind('updated', function(data) {
         fetchComments();
+        fetchLikes();
       });
     })
 
@@ -43,18 +63,32 @@ const Post = forwardRef(
       fetchComments();
     }, []);
 
+
+    useEffect(() => {
+      fetchLikes();
+    }, []);
+
+
     return (
       <div className="post" ref={ref}>
         <div className="post__header">
           <Avatar
             className="post__avatar"
             alt={username}
-            src="https://avatars.dicebear.com/api/male/+{username}.svg"
+            src={"https://avatars.dicebear.com/api/male/"+{username}+".svg"}
           />
           <h3>{username}</h3>
         </div>
 
         <img className="post__image" src={imageUrl} alt="post" />
+        <h4 className="post__text">
+          { user && (
+            likes.map((like) => like.user).indexOf(user.displayName)==-1 ?
+            <div className="like_btn" onClick={updateLike}>♡</div>
+              :<div className="like_btn active" onClick={updateLike} color="red"  >❤️</div>
+            )}
+            {likes.length} Likes
+        </h4>
         <h4 className="post__text">
          <b> {username}</b> <span className="post__caption">{caption}</span>
         </h4>

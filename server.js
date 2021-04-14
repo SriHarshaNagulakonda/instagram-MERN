@@ -68,11 +68,16 @@ const comment=mongoose.Schema({
     comment: String
 })
 
+const like=mongoose.Schema({
+    user: String,
+})
+
 const post = mongoose.Schema({
     caption: String,
     user: String,
     image:String,
-    comments: [comment]
+    comments: [comment],
+    likes: [like]
 });
 const dbModel=mongoose.model('posts',post);
 
@@ -130,6 +135,32 @@ app.get('/api/syncComment',(req,res)=>{
     });
 });
 
+app.post('/api/like',((req,res) => {
+    const body=req.body;
+    dbModel.findById(req.body.post_id,(err,data) => {
+        if(err){
+            res.status(500).send(err);
+            console.log(err)
+        }else{
+            res.status(201).send(data);
+            if(!data.likes.includes(req.body.user)){
+                data.likes.push(req.body);
+                data.save();
+            }
+        }
+    });
+}));
+
+app.get('/api/syncLikes',(req,res)=>{
+    dbModel.findById(req.query.post_id,(err,data)=>{
+        if(err){
+            res.status(500).send(err);
+        }else{
+            res.status(201).send(data.likes);
+            // console.log(data.likes)
+        }
+    });
+});
 
 if(process.env.NODE_ENV === 'production'){
     app.use(express.static('client/build/'));
