@@ -3,11 +3,12 @@ import "./App.css";
 import Post from "./Post";
 import ImageUpload from "./ImageUpload";
 import { db, auth } from "./firebase";
-import { Button, Avatar, makeStyles, Modal, Input, TextField } from "@material-ui/core";
+import { Button, Avatar, makeStyles, Modal, Input, TextField, CircularProgress } from "@material-ui/core";
 import FlipMove from "react-flip-move";
 import InstagramEmbed from "react-instagram-embed";
 import axios from "./axios";
 import  Pusher from "pusher-js";
+import { usePromiseTracker, trackPromise } from "react-promise-tracker";
 
 function getModalStyle() {
   const top = 50;
@@ -72,6 +73,8 @@ function App() {
     };
   }, [user, username]);
 
+  const { promiseInProgress } = usePromiseTracker();
+
   const fetchPosts = async() =>
   await axios.get('/api/sync').then(response => {
     setPosts(response.data);
@@ -84,12 +87,12 @@ function App() {
 
     var channel = pusher.subscribe('posts');
     channel.bind('inserted', function(data) {
-      fetchPosts();
+      trackPromise(fetchPosts());
     });
   })
 
   useEffect(() => {
-    fetchPosts();
+    trackPromise(fetchPosts());
   }, []);
 
   console.log('posts are >>>',posts)
@@ -248,6 +251,17 @@ function App() {
               />
             ))}
           </FlipMove>
+          <br></br>
+          <br></br>
+          <br></br>
+          {promiseInProgress ? 
+            <>
+              <CircularProgress />
+              <br></br>
+              <br></br>
+            </>
+            : ""}
+          
         </div>
         <div className="app__postsRight">
           <InstagramEmbed

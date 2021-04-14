@@ -1,15 +1,10 @@
-.imageUpload{
+.imageupload{
   display: flex;
   flex-direction: column;
-  width: 70%;
+  width: 50%;
   margin-left: auto;
   margin-right: auto;
   margin-top: 10px;
-  margin-bottom: 10px;
-  /* background-color: white;
-  border-top: 1px solid lightgray; */
-  /* position: fixed; */
-  /* bottom: 0; */
 }
 
 .imageUpload__progress{
@@ -30,14 +25,11 @@
 .input__caption  {
   width: 100%;
   padding: 12px 20px;
-
-  /* margin: 8px 0; */
-      margin-top:15px;
+  margin-top:15px;
   box-sizing: border-box;
   border: 3px solid #ccc;
   -webkit-transition: 0.5s;
   transition: 0.5s;
-  outline: none;
 }
 
 .input__caption:focus {

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState,useRef } from "react";
 import { storage } from "./firebase";
 import "./ImageUpload.css";
-import { Input, Button } from "@material-ui/core";
+import { TextField, Button,LinearProgress } from "@material-ui/core";
 // import axios  from './axios';
 import axios from './axios'
 
@@ -10,6 +10,8 @@ const ImageUpload = ({ username }) => {
   const [url, setUrl] = useState("");
   const [progress, setProgress] = useState(0);
   const [caption, setCaption] = useState("");
+
+  const inputFile = useRef(null);
 
   const handleChange = (e) => {
     if (e.target.files[0]) {
@@ -47,14 +49,6 @@ const ImageUpload = ({ username }) => {
               image: url
             });
 
-            // post image inside db
-            // db.collection("posts").add({
-            //   imageUrl: url,
-            //   caption: caption,
-            //   username: username,
-            //   timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            // });
-
             setProgress(0);
             setCaption("");
             setImage(null);
@@ -62,22 +56,35 @@ const ImageUpload = ({ username }) => {
       }
     );
   };
+  
+  const onButtonClick = () => {
+    // `current` points to the mounted file input element
+   inputFile.current.click();
+  };
 
   return (
     <div className="imageupload">
-      <progress className="imageupload__progress" value={progress} max="100" />
-      <Input
-        placeholder="Enter a caption"
-        value={caption}
-        onChange={(e) => setCaption(e.target.value)}
-      />
-      <div>
-        <input type="file" onChange={handleChange} />
-        <Button className="imageupload__button" onClick={handleUpload}>
-          Upload
-        </Button>
+      {/* <progress className="imageupload__progress" value={progress} max="100" /> */}
+      <LinearProgress variant="determinate" value={progress} max="100" />
+      {/* <br></br> */}
+      <div className="row">
+        <div className="col-md-6">
+          <TextField
+            className="input__caption"
+              label="Caption"
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+          />
+        </div>
+        <div className="col-md-6" style={{paddingTop:"10px"}}>
+          <input type="file" onChange={handleChange} ref={inputFile} style={{display: 'none'}}/>
+          <Button color="primary" variant="contained" onClick={onButtonClick}>Browse Image</Button>
+          &nbsp;
+          <Button color="secondary" variant="contained" className="imageupload__button" onClick={handleUpload}>
+            Upload
+          </Button>
+        </div>
       </div>
-
       <br />
     </div>
   );
