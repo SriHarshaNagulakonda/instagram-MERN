@@ -113,7 +113,8 @@ app.post('/api/comment',((req,res) => {
             console.log(err)
         }else{
             res.status(201).send(data);
-            data.save()
+            data.comments.push(req.body);
+            data.save();
         }
     });
 }));

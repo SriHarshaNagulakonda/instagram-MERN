@@ -3,7 +3,7 @@ import "./App.css";
 import Post from "./Post";
 import ImageUpload from "./ImageUpload";
 import { db, auth } from "./firebase";
-import { Button, Avatar, makeStyles, Modal, Input } from "@material-ui/core";
+import { Button, Avatar, makeStyles, Modal, Input, TextField } from "@material-ui/core";
 import FlipMove from "react-flip-move";
 import InstagramEmbed from "react-instagram-embed";
 import axios from "./axios";
@@ -40,6 +40,10 @@ function App() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [EmailError, setEmailError] = useState("");
+  const [PasswordError, setPasswordError] = useState("");
+  const [UsernameError, setUsernameError] = useState("");
+  const [loginError, setloginError] = useState("")
   const [user, setUser] = useState(null);
   const [open, setOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
@@ -94,18 +98,48 @@ function App() {
     e.preventDefault();
     auth
       .signInWithEmailAndPassword(email, password)
-      .catch((error) => alert(error.message));
+      .then(() => {
+        setloginError("")
+        setOpen(false);
+      })
+      .catch((error) => {
+        setloginError(error.message)
+        setOpen(true);
+      }
+    );
 
-    setOpen(false);
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
     auth
       .createUserWithEmailAndPassword(email, password)
-      .catch((error) => alert(error.message));
+      .then(() => {
+        setEmailError("");
+        setPasswordError("");
+        setUsernameError("");
+        setRegisterOpen(false);
+      })
+      .catch((error) => {
+        var msg=error.message.toLowerCase();
+        if(msg.includes("email")){
+          setEmailError(error.message);
+          setUsernameError("");
+          setPasswordError("");
+        }
+        else if(msg.includes("password")){
+          setPasswordError(error.message);
+          setUsernameError("");
+          setEmailError("");
+        }
+        else{
+          setUsernameError(error.message);
+          setEmailError("");
+          setPasswordError("");
+        }
+         setRegisterOpen(true);         
+      });
 
-    setRegisterOpen(false);
   };
 
   return (
@@ -121,19 +155,20 @@ function App() {
               />
             </center>
 
-            <Input
-              placeholder="email"
+            <TextField
+              label="Email"
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Input
-              placeholder="password"
+            <TextField
+              label="Password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <Button onClick={handleLogin}>Login</Button>
+            <p style={{color:"red"}}>{loginError}</p>
+            <Button color="secondary" variant="contained"  onClick={handleLogin}>Login</Button>
           </form>
         </div>
       </Modal>
@@ -148,25 +183,31 @@ function App() {
                 alt=""
               />
             </center>
-            <Input
+            <TextField
               type="text"
-              placeholder="username"
               value={username}
+              helperText={UsernameError}
+              error={UsernameError}
+              label="Username"
               onChange={(e) => setUsername(e.target.value)}
             />
-            <Input
-              placeholder="email"
+            <TextField
+              label="Email"
               type="text"
               value={email}
+              helperText={EmailError}
+              error={EmailError}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Input
-              placeholder="password"
+            <TextField
+              label="Password"
               type="password"
               value={password}
+              helperText={PasswordError}
+              error={PasswordError}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <Button onClick={handleRegister}>Register</Button>
+            <Button color="primary" variant="contained" onClick={handleRegister}>Register</Button>
           </form>
         </div>
       </Modal>

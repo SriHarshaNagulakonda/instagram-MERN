@@ -3,6 +3,7 @@ import "./Post.css";
 import Avatar from "@material-ui/core/Avatar";
 import axios from './axios';
 import Pusher from "pusher-js"
+import {Button} from "@material-ui/core";
 
 const Post = forwardRef(
   ({ user, username, postId, imageUrl, caption }, ref) => {
@@ -48,17 +49,19 @@ const Post = forwardRef(
           <Avatar
             className="post__avatar"
             alt={username}
-            src="/static/images/avatar/1.jpg"
+            src="https://avatars.dicebear.com/api/male/+{username}.svg"
           />
           <h3>{username}</h3>
         </div>
 
         <img className="post__image" src={imageUrl} alt="post" />
         <h4 className="post__text">
-          {username} <span className="post__caption">{caption}</span>
+         <b> {username}</b> <span className="post__caption">{caption}</span>
         </h4>
 
+        
         <div className="post__comments">
+          Comments
           {comments.map((comment) => (
             <p>
               <b>{comment.user}</b> {comment.comment}
@@ -69,7 +72,7 @@ const Post = forwardRef(
         {user && (
           <form className="post__commentBox">
             <input
-              className="post__input"
+              className="post__input input"
               type="text"
               placeholder="Add a comment..."
               value={comment}
