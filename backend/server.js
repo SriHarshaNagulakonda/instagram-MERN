@@ -2,7 +2,6 @@ const express=require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const Pusher = require('pusher');
-// const {dbModel} = require('./dbModel.js');
 
 //app config
 const app=express();
@@ -37,7 +36,7 @@ mongoose.connection.once('open',()=>{
 
     changeStream.on('change',(change) => {
         console.log('change triggered')
-        console.log(change);
+        console.log(change.operationType);
         console.log('end of change')
         
         if(change.operationType== 'insert'){
@@ -49,6 +48,13 @@ mongoose.connection.once('open',()=>{
                 image: postDetails.image
             });
         }
+        else if(change.operationType== 'update'){
+            console.log('triggerein pusher img upload')
+            // const postDetails = change.fullDocument;
+            pusher.trigger('posts','updated',{
+                // comments:[postDetails.comments]
+            });
+        }
         else{
             console.log('unkown pusher')
         }
@@ -56,13 +62,22 @@ mongoose.connection.once('open',()=>{
 
 })
 
-const instance = mongoose.Schema({
+const comment=mongoose.Schema({
+    user: String,
+    comment: String
+})
+
+const post = mongoose.Schema({
     caption: String,
     user: String,
     image:String,
-    comments: []
+    comments: [comment]
 });
-const dbModel=mongoose.model('posts',instance);
+const dbModel=mongoose.model('posts',post);
+
+
+
+// const Comment=mongoose.model('comments',comment);
 
 // api routes
 app.get('/',(req,res) => res.status(200).send("hello world"));
@@ -87,8 +102,32 @@ app.get('/sync',(req,res)=>{
             res.status(201).send(data)
         }
     })
-})
+});
+
+app.post('/comment',((req,res) => {
+    const body=req.body;
+    dbModel.findById(req.body.post_id,(err,data) => {
+        if(err){
+            res.status(500).send(err);
+            console.log(err)
+        }else{
+            res.status(201).send(data);
+            data.save()
+        }
+    });
+}));
+
+app.get('/syncComment',(req,res)=>{
+    dbModel.findById(req.query.post_id,(err,data)=>{
+        if(err){
+            res.status(500).send(err);
+        }else{
+            res.status(201).send(data.comments);
+            console.log(data.comments)
+        }
+    });
+});
 
 
-// lister
+// listen
 app.listen(port,() => console.log('listening to port'));

@@ -3,38 +3,46 @@ import "./Post.css";
 import Avatar from "@material-ui/core/Avatar";
 import { db } from "./firebase";
 import firebase from "firebase";
+import axios from './axios';
+import Pusher from "pusher-js"
 
 const Post = forwardRef(
   ({ user, username, postId, imageUrl, caption }, ref) => {
     const [comments, setComments] = useState([]);
     const [comment, setComment] = useState("");
 
-    useEffect(() => {
-      let unsubscribe;
-      if (postId) {
-        unsubscribe = db
-          .collection("posts")
-          .doc(postId)
-          .collection("comments")
-          .onSnapshot((snapshot) => {
-            setComments(snapshot.docs.map((doc) => doc.data()));
-          });
-      }
-
-      return () => {
-        unsubscribe();
-      };
-    }, [postId]);
-
     const postComment = (e) => {
       e.preventDefault();
 
-      db.collection("posts").doc(postId).collection("comments").add({
-        text: comment,
-        username: user.displayName,
+      axios.post("/comment",{
+        comment: comment,
+        user: user.displayName,
+        post_id: postId
       });
       setComment("");
     };
+
+    const data={post_id:postId};
+    const fetchComments = async() =>
+    await axios.get('/syncComment',{"params":data}).then(response => {
+      console.log("Comments are >>>>>",response);
+      setComments(response.data);
+    });
+  
+    useEffect(() => {
+      var pusher = new Pusher('cccdc78c6de2ce551133', {
+        cluster: 'ap2'
+      });
+  
+      var channel = pusher.subscribe('posts');
+      channel.bind('updated', function(data) {
+        fetchComments();
+      });
+    })
+
+    useEffect(() => {
+      fetchComments();
+    }, []);
 
     return (
       <div className="post" ref={ref}>
@@ -55,7 +63,7 @@ const Post = forwardRef(
         <div className="post__comments">
           {comments.map((comment) => (
             <p>
-              <b>{comment.username}</b> {comment.text}
+              <b>{comment.user}</b> {comment.comment}
             </p>
           ))}
         </div>
