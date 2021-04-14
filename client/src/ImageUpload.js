@@ -41,7 +41,7 @@ const ImageUpload = ({ username }) => {
           .then((url) => {
             setUrl(url);
 
-            axios.post('/upload',{
+            axios.post('/api/upload',{
               caption: caption,
               user: username,
               image: url

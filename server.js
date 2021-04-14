@@ -81,9 +81,9 @@ const dbModel=mongoose.model('posts',post);
 // const Comment=mongoose.model('comments',comment);
 
 // api routes
-app.get('/',(req,res) => res.status(200).send("hello world"));
+app.get('/api/',(req,res) => res.status(200).send("hello world"));
 
-app.post('/upload',(req,res) => {
+app.post('/api/upload',(req,res) => {
     const body=req.body;
     dbModel.create(body,(err,data) => {
         if(err){
@@ -95,7 +95,7 @@ app.post('/upload',(req,res) => {
 
 });
 
-app.get('/sync',(req,res)=>{
+app.get('/api/sync',(req,res)=>{
     dbModel.find((err,data)=>{
         if(err){
             res.status(500).send(err);
@@ -105,7 +105,7 @@ app.get('/sync',(req,res)=>{
     })
 });
 
-app.post('/comment',((req,res) => {
+app.post('/api/comment',((req,res) => {
     const body=req.body;
     dbModel.findById(req.body.post_id,(err,data) => {
         if(err){
@@ -118,7 +118,7 @@ app.post('/comment',((req,res) => {
     });
 }));
 
-app.get('/syncComment',(req,res)=>{
+app.get('/api/syncComment',(req,res)=>{
     dbModel.findById(req.query.post_id,(err,data)=>{
         if(err){
             res.status(500).send(err);

@@ -69,7 +69,7 @@ function App() {
   }, [user, username]);
 
   const fetchPosts = async() =>
-  await axios.get('/sync').then(response => {
+  await axios.get('/api/sync').then(response => {
     setPosts(response.data);
   });
 

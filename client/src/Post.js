@@ -12,7 +12,7 @@ const Post = forwardRef(
     const postComment = (e) => {
       e.preventDefault();
 
-      axios.post("/comment",{
+      axios.post("/api/comment",{
         comment: comment,
         user: user.displayName,
         post_id: postId
@@ -22,7 +22,7 @@ const Post = forwardRef(
 
     const data={post_id:postId};
     const fetchComments = async() =>
-    await axios.get('/syncComment',{"params":data}).then(response => {
+    await axios.get('/api/syncComment',{"params":data}).then(response => {
       console.log("Comments are >>>>>",response);
       setComments(response.data);
     });
