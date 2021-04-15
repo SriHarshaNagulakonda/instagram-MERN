@@ -4,6 +4,7 @@ import "./ImageUpload.css";
 import { TextField, Button,LinearProgress } from "@material-ui/core";
 // import axios  from './axios';
 import axios from './axios'
+import Snackbar from '@material-ui/core/Snackbar';
 
 const ImageUpload = ({ username }) => {
   const [image, setImage] = useState(null);
@@ -13,29 +14,20 @@ const ImageUpload = ({ username }) => {
 
   const inputFile = useRef(null);
 
-  const handleChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-
   const handleUpload = () => {
     const uploadTask = storage.ref(`images/${image.name}`).put(image);
     uploadTask.on(
       "state_changed",
       (snapshot) => {
-        // progress function ...
         const progress = Math.round(
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         );
         setProgress(progress);
       },
       (error) => {
-        // Error function ...
         console.log(error);
       },
       () => {
-        // complete function ...
         storage
           .ref("images")
           .child(image.name)
@@ -58,15 +50,12 @@ const ImageUpload = ({ username }) => {
   };
   
   const onButtonClick = () => {
-    // `current` points to the mounted file input element
    inputFile.current.click();
   };
 
   return (
     <div className="imageupload">
-      {/* <progress className="imageupload__progress" value={progress} max="100" /> */}
       <LinearProgress variant="determinate" value={progress} max="100" />
-      {/* <br></br> */}
       <div className="row">
         <div className="col-md-6">
           <TextField
@@ -86,6 +75,15 @@ const ImageUpload = ({ username }) => {
         </div>
       </div>
       <br />
+      <div>
+        <Snackbar
+          anchorOrigin={{ vertical, horizontal }}
+          open={open}
+          onClose={handleClose}
+          message="I love snacks"
+          key={vertical + horizontal}
+        />
+      </div>
     </div>
   );
 };

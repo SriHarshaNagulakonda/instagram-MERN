@@ -10,6 +10,7 @@
     "axios": "^0.21.1",
     "firebase": "^7.15.5",
     "image-file-to-base64-exif": "^1.0.3",
+    "notistack": "^1.0.5",
     "pusher-js": "^7.0.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
