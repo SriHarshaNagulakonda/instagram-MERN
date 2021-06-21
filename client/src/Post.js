@@ -4,6 +4,11 @@ import Avatar from "@material-ui/core/Avatar";
 import axios from './axios';
 import Pusher from "pusher-js"
 import {Button} from "@material-ui/core";
+import io from "socket.io-client";
+const socket = io("http://localhost:8000/");
+socket.on('hello',(data) => {
+  console.log(data);
+})
 
 const Post = forwardRef(
   ({ user, username, postId, imageUrl, caption }, ref) => {
@@ -48,14 +53,17 @@ const Post = forwardRef(
     });
 
     useEffect(() => {
-      var pusher = new Pusher('cccdc78c6de2ce551133', {
-        cluster: 'ap2'
-      });
+      // var pusher = new Pusher('cccdc78c6de2ce551133', {
+      //   cluster: 'ap2'
+      // });
   
-      var channel = pusher.subscribe('posts');
-      channel.bind('updated', function(data) {
-        fetchComments();
-        fetchLikes();
+      // var channel = pusher.subscribe('posts');
+      // channel.bind('updated', function(data) {
+      //   fetchComments();
+      //   fetchLikes();
+      // });
+      socket.on('login', (data) => {
+          alert('hi');
       });
     })
 

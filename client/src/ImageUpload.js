@@ -2,9 +2,7 @@ import React, { useState,useRef } from "react";
 import { storage } from "./firebase";
 import "./ImageUpload.css";
 import { TextField, Button,LinearProgress } from "@material-ui/core";
-// import axios  from './axios';
 import axios from './axios'
-import Snackbar from '@material-ui/core/Snackbar';
 
 const ImageUpload = ({ username }) => {
   const [image, setImage] = useState(null);
@@ -13,6 +11,12 @@ const ImageUpload = ({ username }) => {
   const [caption, setCaption] = useState("");
 
   const inputFile = useRef(null);
+
+  const handleChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
 
   const handleUpload = () => {
     const uploadTask = storage.ref(`images/${image.name}`).put(image);
@@ -75,15 +79,7 @@ const ImageUpload = ({ username }) => {
         </div>
       </div>
       <br />
-      <div>
-        <Snackbar
-          anchorOrigin={{ vertical, horizontal }}
-          open={open}
-          onClose={handleClose}
-          message="I love snacks"
-          key={vertical + horizontal}
-        />
-      </div>
+
     </div>
   );
 };

@@ -8,6 +8,19 @@ const path = require('path');
 const app=express();
 const port=process.env.PORT||8000;
 
+
+const http = require("http").Server(app);
+http.listen(port,() => console.log('listening to port'));
+
+const io = require("socket.io")(http);
+io.listen(http);
+
+io.on("connection", function(socket) {
+    socket.emit('hello' ,{
+        greeting:"Hello world"
+    });
+});
+
 const pusher = new Pusher({
   appId: "1186739",
   key: "cccdc78c6de2ce551133",
@@ -36,10 +49,7 @@ mongoose.connection.once('open',()=>{
     const changeStream = mongoose.connection.collection('posts').watch()
 
     changeStream.on('change',(change) => {
-        console.log('change triggered')
-        console.log(change.operationType);
-        console.log('end of change')
-        
+       
         if(change.operationType== 'insert'){
             console.log('triggerein pusher img upload')
             const postDetails = change.fullDocument;
@@ -50,10 +60,9 @@ mongoose.connection.once('open',()=>{
             });
         }
         else if(change.operationType== 'update'){
-            console.log('triggerein pusher img upload')
-            // const postDetails = change.fullDocument;
-            pusher.trigger('posts','updated',{
-                // comments:[postDetails.comments]
+            console.log('triggerein comment')
+            io.on('connection',function(socket){
+                console.log('please');
             });
         }
         else{
@@ -170,4 +179,3 @@ if(process.env.NODE_ENV === 'production'){
 }
 
 // listen
-app.listen(port,() => console.log('listening to port'));
